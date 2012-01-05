@@ -1,0 +1,5 @@
+# outcomment to disable logging for that module
+
+# run in your project dir
+# python walk.py >> helpers_config_mod.txt 
+# to fill this file
