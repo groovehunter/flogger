@@ -35,7 +35,7 @@ class Flogger:
         self.mainswitch = mainswitch
         # read config which modules to log
         self.modules_tolog = []
-        modules = file(ROOT+SUB+'/helpers_config_mod.txt','r').readlines()
+        modules = file(ROOT+SUB+'/flogger/helpers_config_mod.txt','r').readlines()
         for m in modules:
             if m.startswith('#') or m.startswith("\n"):
                 continue
@@ -118,7 +118,7 @@ class Flogger:
 
         # prefix with label if given
         if l:
-            out = l +': '+out
+            out = l +': \t'+out
 
         method = m.group(2)
         mth = method.split(" ")
@@ -137,7 +137,7 @@ class Flogger:
             mout,
         ) 
         # tab calculation 
-        llen = len(lnr+mout)+2+llen1+8*(ltab1-1)
+        llen = len(lnr+mout)+2+ llen1+ 8*(ltab1-1)
         ltab =(10-int( llen/8 ))
 
         # for long texts
@@ -149,11 +149,11 @@ class Flogger:
             line = "%s\n%s" %(line1, out)
         else:
             line = "%s\n%s" %(line1, out)
-            line += "\n"+"_"*90+"\n"
+            line += "\n"+"_"*90
 
         ### WRITE TO FILE
         self.f.write( line )
-        self.f.write( str( (llen1, ltab1, llen, ltab) ) )
+        #self.f.write( str( (llen1, ltab1, llen, ltab) ) )
 
 
 ### compat, remove in new projects using nlog
