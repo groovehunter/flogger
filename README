@@ -1,0 +1,14 @@
+Flogger, logging module for python
+
+* configurable in central file to enable logging 
+* seperately for each module in codebase
+
+
+
+TODO
+
+* hierarchical inheritance of log level and enabling if wanted
+* enable log levels
+* remove compatibilty (when projects upgraded)
+* cleanup
+
