@@ -7,7 +7,6 @@ from time import localtime, strftime
 from datetime import datetime
 
 from helpers_config import DLOG, mainswitch
-from settings import ROOT,SUB
 
 # TODO 
 # various log levels
@@ -25,9 +24,7 @@ class Flogger:
     # regexp fuer stacktrace line - nur filename
     #expr = re.compile('.+/([^/]+\.py)", (line \d+, in \w+)\n.+')
 
-    subroot = ROOT+SUB
     #trace_raw = '  File "'+subroot+'(.*\.py)", (line \d+, in \w+)\n.+'
-    expr = re.compile('  File "'+subroot+'/(.*\.py)", (line \d+, in \w+)\n.+')
     def __init__(self, mainswitch=True):
         self.prefix = ''
         self.trace_lnr = -3
@@ -35,13 +32,18 @@ class Flogger:
         self.mainswitch = mainswitch
         # read config which modules to log
         self.modules_tolog = []
-        modules = file(ROOT+SUB+'/flogger/helpers_config_mod.txt','r').readlines()
+        self.root = os.getcwd()
+        self.sub = ''
+
+    def set_globals(self):
+        self.subroot = self.root+self.sub
+        modules = file(self.subroot+'/flogger/helpers_config_mod.txt','r').readlines()
         for m in modules:
             if m.startswith('#') or m.startswith("\n"):
                 continue
             self.modules_tolog.append(m.strip("\n"))
+        self.expr = re.compile('  File "'+self.subroot+'/(.*\.py)", (line \d+, in \w+)\n.+')
 
-    def set_globals(self):
         self.today = strftime('%Y-%m-%d')
         ldir = os.path.join(DLOG, self.today)
         # prefix can be set from application, ie for per-user log files
@@ -82,13 +84,14 @@ class Flogger:
 
         ### traceback check relevant line and match
         tracelines = traceback.format_stack()
-        #self.f.write('trace_lnr '+str(self.tr_lnr)+"\n")
+        self.f.write('trace_lnr '+str(self.tr_lnr)+"\n")
         s = tracelines[self.tr_lnr] 
-        #self.f.write("s: "+str(s))
+        self.f.write(str("\n".join(tracelines)))
+        self.f.write("s: "+str(s))
         m = self.expr.match( s )
         if not m:
             line = "dlog:err eval strack expr # "
-            line += out +  "\n"
+            line += var +  "\n"
             self.f.write(line)
             return
 
@@ -157,11 +160,9 @@ class Flogger:
 
 
 ### compat, remove in new projects using nlog
-flogger = Flogger()
-flogger.set_globals()
-
-
 def dlog(var, v):
+    flogger = Flogger()
+    flogger.set_globals()
     """ wrapper for compat """
     flogger.tr_lnr = -3      # one stacklevel deeper from here
     return flogger.dlog(var, v)
